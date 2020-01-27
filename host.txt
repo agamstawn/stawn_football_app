@@ -1,0 +1,2 @@
+firebase : https://stawn-football-app.firebaseapp.com
+github : https://github.com/agamstawn/stawn_football_app.git
