@@ -29,6 +29,7 @@ workbox.precaching.precacheAndRoute([
   { url: '/js/myleague.js', revision: '1' },
   { url: '/js/profile_team.js', revision: '1' },
   { url: '/js/sw.js', revision: '1' },
+  { url: 'manifest.json', revision: '1' },
 ]);
 
 workbox.routing.registerRoute(
