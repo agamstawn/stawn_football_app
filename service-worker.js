@@ -1,9 +1,11 @@
 importScripts('https://storage.googleapis.com/workbox-cdn/releases/3.6.3/workbox-sw.js');
 
-if (workbox)
+if (workbox){
   console.log(`Workbox berhasil dimuat`);
-else
+}
+else{
   console.log(`Workbox gagal dimuat`);
+}
 
 workbox.precaching.precacheAndRoute([
   { url: '/', revision: '1' },
@@ -29,8 +31,13 @@ workbox.precaching.precacheAndRoute([
   { url: '/js/myleague.js', revision: '1' },
   { url: '/js/profile_team.js', revision: '1' },
   { url: '/js/sw.js', revision: '1' },
-  { url: 'manifest.json', revision: '1' },
+  { url: 'manifest.json', revision: '1' }
 ]);
+
+workbox.routing.registerRoute(
+  new RegExp('https://api.football-data.org/v2/'),
+  workbox.strategies.staleWhileRevalidate()
+);
 
 workbox.routing.registerRoute(
   new RegExp('/pages/'),
@@ -66,13 +73,6 @@ workbox.routing.registerRoute(
   }),
 );
 
-workbox.routing.registerRoute(
-  new RegExp('https://api.football-data.org/v2'),
-  workbox.strategies.staleWhileRevalidate({
-      cacheName: 'api'
-  })
-);
-
 // Menyimpan cache dari CSS Google Fonts
 workbox.routing.registerRoute(
   /^https:\/\/fonts\.googleapis\.com/,
@@ -97,6 +97,25 @@ workbox.routing.registerRoute(
     ],
   })
 );
+
+self.addEventListener("fetch", function(event){
+  event.respondWith(
+    caches
+      .match(event.request, { cacheName: 'api' })
+      .then(function(response){
+        if (response) {
+          console.log("ServiceWorker : Gunakan aset dari cache: ", response.url);
+          return response;
+        }
+
+        console.log(
+          "ServiceWorker: memuat dari server: ",
+          event.request.url
+        );
+        return fetch(event.request);
+      })
+      );
+});
 
 self.addEventListener('push', function (event) {
     var body;
